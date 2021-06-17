@@ -1,10 +1,11 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const port = 5000;
 const la = require('./kissasian.la')
 const ai = require('./kissasian.ai')
 const v3 = require('./watchasian')
+
+const port = process.env.PORT || 5000;;
 
 app.use(cors())
 
