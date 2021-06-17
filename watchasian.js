@@ -90,6 +90,7 @@ router.get(`${api}/info/:id`, (req, res) => {
             const $ = cheerio.load(html)
             let img = $(".img").children("img").attr("src")
             let title = $(".info").children("h1").text()
+            let othername = $(".other_name").children("a").first().attr("title")
             
             let country
             let status;
@@ -131,7 +132,7 @@ router.get(`${api}/info/:id`, (req, res) => {
                 ep[index] = { id, episode, sub, epName }
             })
    
-            results = { img, title, trailer, country, status, released, genre, ep }
+            results = { img, title, othername, trailer, country, status, released, genre, ep }
             res.json({ success: true, results: results })
           
         } catch (e) {
