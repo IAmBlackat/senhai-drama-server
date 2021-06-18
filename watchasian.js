@@ -80,6 +80,27 @@ router.get(`${api}/popular/:page`, (req, res) => {
     }) 
 })
 
+router.get(`${api}/search/:query`, (req, res) => {
+    let results = []
+    url = `${base}/search?keyword=${req.params.query}`
+    rs(url, (err,resp, html) => {
+        if(err) return res.json({ success: false, error: err, results: results  })
+        try {
+            const $ = cheerio.load(html)
+            $(".img").each(function(index, e) {
+                let id = $(this).attr().href.replace("/drama-detail/","")
+                let title = $(this).children("h3").text()
+                let img = $(this).children("img").attr("data-original")
+                results[index] = { id, title, img }
+            })
+            res.json({ success: true, results: results })
+          
+        } catch (e) {
+            res.json({ success: false, error: "Something went wrong", results: results  })
+        }
+    })
+})
+
 router.get(`${api}/info/:id`, (req, res) => {
     let results = []
     // let details = []
