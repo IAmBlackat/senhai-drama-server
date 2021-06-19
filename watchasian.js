@@ -203,7 +203,8 @@ router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
             let ep = []
             $(".list-episode-item-2").children("li").children("a")
             .each(function(index, e) {
-                let episode = $(this).children("h3").text().trim().replace(title, "").replace("Episode","").trim()
+                
+                let episode = $(this).children("h3").text().trim().replace(mainTitle, "").replace("Episode","").trim()
                 let epName = $(this).children("h3").text().trim()
                 let sub = $(this).children(".type").text()
                 let id = $(this).attr("href")
