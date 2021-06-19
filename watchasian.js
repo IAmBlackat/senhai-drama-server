@@ -162,7 +162,7 @@ router.get(`${api}/info/:id`, (req, res) => {
     })
 })
 
-const getEpisodeUrl = (url, res, title, lastEp) => {
+const getEpisodeUrl = (url, res, title, lastEp, ep) => {
     let results = []
     // console.log(url)
     rs(url, (err,resp,html) => {
@@ -177,7 +177,7 @@ const getEpisodeUrl = (url, res, title, lastEp) => {
                     })
                 }
             }) 
-            res.json({ success: true, results: results, title: title, lastEp: Number(lastEp) })
+            res.json({ success: true, results: results, title: title, lastEp: Number(lastEp), ep })
         } catch (e) {
             res.status(404).json({ success: false, error: "Something went wrong", get: "getUrl" })
         }
@@ -199,8 +199,21 @@ router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
             let lastEp = $(".list-episode-item-2, .all-episode")
             .children("li").first().children("a").children(".title").text()
             .replace(mainTitle, "").replace("Episode", "").trim()
+
+            let ep = []
+            $(".list-episode-item-2").children("li").children("a")
+            .each(function(index, e) {
+                let episode = $(this).children("h3").text().trim().replace(title, "").replace("Episode","").trim()
+                let epName = $(this).children("h3").text().trim()
+                let sub = $(this).children(".type").text()
+                let id = $(this).attr("href")
+                .replace(".html","").replace("/","")
+                .replace(`-episode-${episode}`,"")
+
+                ep[index] = { id, episode, sub, epName }
+            })
             
-            getEpisodeUrl(`https:${streamUrl}`, res, title, lastEp)
+            getEpisodeUrl(`https:${streamUrl}`, res, title, lastEp, ep)
           
         } catch (e) {
             res.status(404).json({ success: false, error: "Something went wrong" })
