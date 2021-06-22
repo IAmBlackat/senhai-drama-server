@@ -6,7 +6,7 @@ const rs = require("request");
 const base = 'https://watchasian.cc'
 const api = '/api/v3/drama'
 
-router.get(`${api}/recent/:page`, (req, res) => {
+router.get(`${api}/recent/:page/part/:part`, (req, res) => {
     let results = []
     let url = `${base}/recently-added-kshow?page=${req.params.page}`
     rs(url, (err, resp, html) => {
@@ -56,7 +56,7 @@ router.get(`${api}/upcoming`, (req, res) => {
     })
 })
 
-router.get(`${api}/popular/:page`, (req, res) => {
+router.get(`${api}/popular/:page/part/:part`, (req, res) => {
     let results = []
     let url = `${base}/most-popular-drama?page=${req.params.page}`
     rs(url, (err, resp, html) => {
@@ -72,7 +72,19 @@ router.get(`${api}/popular/:page`, (req, res) => {
                 let img = $(this).children("img").attr("data-original")
                 results[index] = { id, title, img }
             })
-            res.json({ success: true, results: results })
+            
+            if(Number(req.params.part) === 1) {
+                res.json({ success: true, results: results.slice(0,12) })
+            }
+            else if(Number(req.params.part) === 2) {
+                res.json({ success: true, results: results.slice(12,24) })
+            } else if(Number(req.params.part) === 3) {
+                res.json({ success: true, results: results.slice(24,36) })
+            }
+            // let part1 = results.slice(0,12)
+            // let part2 = results.slice(13,24)
+            // let part3 = results.slice(25,36)
+
           
         } catch (e) {
             res.json({ success: false, error: "Something went wrong", results: results  })
@@ -80,7 +92,7 @@ router.get(`${api}/popular/:page`, (req, res) => {
     }) 
 })
 
-router.get(`${api}/search/:query`, (req, res) => {
+router.get(`${api}/search/:query/part/:part`, (req, res) => {
     let results = []
     url = `${base}/search?keyword=${req.params.query}`
     rs(url, (err,resp, html) => {
@@ -152,8 +164,12 @@ router.get(`${api}/info/:id`, (req, res) => {
 
                 ep[index] = { id, episode, sub, epName }
             })
+
+            let lastEp = $(".list-episode-item-2, .all-episode")
+            .children("li").first().children("a").children(".title").text()
+            .replace(title, "").replace("Episode", "").trim()
    
-            results = { img, title, othername, trailer, country, status, released, genre, ep }
+            results = { img, title, othername, trailer, country, status, released, genre, ep, lastEp }
             res.json({ success: true, results: results })
           
         } catch (e) {
@@ -162,7 +178,7 @@ router.get(`${api}/info/:id`, (req, res) => {
     })
 })
 
-const getEpisodeUrl = (url, res, title, lastEp, ep) => {
+const getEpisodeUrl = (url, res, title, lastEp, ep, mainId) => {
     let results = []
     // console.log(url)
     rs(url, (err,resp,html) => {
@@ -177,7 +193,7 @@ const getEpisodeUrl = (url, res, title, lastEp, ep) => {
                     })
                 }
             }) 
-            res.json({ success: true, results: results, title: title, lastEp: Number(lastEp), ep })
+            res.json({ success: true, results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })
         } catch (e) {
             res.status(404).json({ success: false, error: "Something went wrong", get: "getUrl" })
         }
@@ -196,6 +212,7 @@ router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
             let src = $("iframe").attr("src")
             let streamUrl = src.replace("streaming.php", "download")
             let mainTitle = $(".category").children("a").text()
+            let mainId = $(".category").children("a").attr("href").replace("/drama-detail/","")
             let lastEp = $(".list-episode-item-2, .all-episode")
             .children("li").first().children("a").children(".title").text()
             .replace(mainTitle, "").replace("Episode", "").trim()
@@ -203,7 +220,6 @@ router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
             let ep = []
             $(".list-episode-item-2").children("li").children("a")
             .each(function(index, e) {
-                
                 let episode = $(this).children("h3").text().trim().replace(mainTitle, "").replace("Episode","").trim()
                 let epName = $(this).children("h3").text().trim()
                 let sub = $(this).children(".type").text()
@@ -214,7 +230,7 @@ router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
                 ep[index] = { id, episode, sub, epName }
             })
             
-            getEpisodeUrl(`https:${streamUrl}`, res, title, lastEp, ep)
+            getEpisodeUrl(`https:${streamUrl}`, res, title, lastEp, ep, mainId)
           
         } catch (e) {
             res.status(404).json({ success: false, error: "Something went wrong" })

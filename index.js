@@ -5,7 +5,7 @@ const la = require('./kissasian.la')
 const ai = require('./kissasian.ai')
 const v3 = require('./watchasian')
 
-const port = process.env.PORT || 5000;;
+const port = process.env.PORT || 5000;
 
 var whitelist = ['http://localhost:3000', 'https://sh-drama.vercel.app']
 var corsOptionsDelegate = function (req, callback) {
