@@ -7,7 +7,7 @@ const v3 = require('./watchasian')
 
 const port = process.env.PORT || 5000;
 
-var whitelist = ['http://localhost:3000', 'https://sh-drama.vercel.app']
+var whitelist = ['http://localhost:3000', 'https://sh-drama.vercel.app', 'https://sh-drama.netlify.app']
 var corsOptionsDelegate = function (req, callback) {
   var corsOptions;
   if (whitelist.indexOf(req.header('Origin')) !== -1) {
