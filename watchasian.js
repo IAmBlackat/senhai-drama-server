@@ -200,6 +200,27 @@ const getEpisodeUrl = (url, res, title, lastEp, ep, mainId) => {
     })
 }   
 
+const newUrl = ( res, id, episode, title, lastEp, ep, mainId ) => {
+    let results = []
+    let url = `https://kdramahood.com/nt/${id}-ep-${episode}`
+    rs(url, (err,resp,html) => {
+        if(err) return res.status(404).json({ success: false, error: err })
+        try {
+            const $ = cheerio.load(html)
+            // let src = $('.jw-media .jw-reset').children('video').attr("src")
+            $('.linkstv').children('div').children('li').children('a').each( (i,el) => {
+                if(el.attribs.download === "video.mp4"){
+                    results.push(el.attribs.href)
+                }
+            })
+            
+            res.json({ success: true, results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })            
+        } catch (e) {
+            res.status(404).json({ success: false, error: "Something went wrong", get: "getUrl" })
+        }
+    })
+}
+
 // watching/:id/:episode/:number
 router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
     let results = []
@@ -230,7 +251,10 @@ router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
                 ep[index] = { id, episode, sub, epName }
             })
             
-            getEpisodeUrl(`https:${streamUrl}`, res, title, lastEp, ep, mainId)
+            // getEpisodeUrl(`https:${streamUrl}`, res, title, lastEp, ep, mainId)
+            let id = req.params.id.replace('-2021',"")
+            let episode = req.params.number
+            newUrl( res, id, episode, title, lastEp, ep, mainId )
           
         } catch (e) {
             res.status(404).json({ success: false, error: "Something went wrong" })
