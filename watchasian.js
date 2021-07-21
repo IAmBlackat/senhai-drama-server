@@ -252,7 +252,7 @@ router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
             })
             
             // getEpisodeUrl(`https:${streamUrl}`, res, title, lastEp, ep, mainId)
-            let id = req.params.id.replace('-2021',"")
+            let id = req.params.id.replace(/-20\d\d/gm,"")
             let episode = req.params.number
             newUrl( res, id, episode, title, lastEp, ep, mainId )
           
