@@ -201,6 +201,7 @@ const getEpisodeUrl = (url, res, title, lastEp, ep, mainId) => {
 }   
 
 const newUrl = ( res, id, episode, title, lastEp, ep, mainId ) => {
+    console.log(id)
     let results = []
     let url = `https://kdramahood.com/nt/${id}-ep-${episode}`
     rs(url, (err,resp,html) => {
@@ -254,6 +255,7 @@ router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
             // getEpisodeUrl(`https:${streamUrl}`, res, title, lastEp, ep, mainId)
             let id = req.params.id.replace(/-20\d\d/gm,"")
             let episode = req.params.number
+            
             newUrl( res, id, episode, title, lastEp, ep, mainId )
           
         } catch (e) {
