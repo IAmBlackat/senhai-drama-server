@@ -203,18 +203,18 @@ const getEpisodeUrl = (url, res, title, lastEp, ep, mainId) => {
 const newUrl = ( res, id, episode, title, lastEp, ep, mainId ) => {
     console.log(id)
     let results = []
-    let url = `https://kdramahood.com/nt/${id}-ep-${episode}`
+    let endpoint = `${id}-ep-${episode}`
+    let url = `https://kdramahood.com/nt/${endpoint}`
     rs(url, (err,resp,html) => {
         if(err) return res.status(404).json({ success: false, error: err })
         try {
             const $ = cheerio.load(html)
             // let src = $('.jw-media .jw-reset').children('video').attr("src")
             $('.linkstv').children('div').children('li').children('a').each( (i,el) => {
-                if(el.attribs.download === "video.mp4"){
+                if(el.attribs.download === endpoint){
                     results.push(el.attribs.href)
                 }
             })
-            
             res.json({ success: true, results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })            
         } catch (e) {
             res.status(404).json({ success: false, error: "Something went wrong", get: "getUrl" })
