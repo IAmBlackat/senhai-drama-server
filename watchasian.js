@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router()
 const cheerio = require("cheerio");
 const rs = require("request");
+const chromium = require('chrome-aws-lambda');
+const puppeteer = require("puppeteer")
 
 const base = 'https://watchasian.cc'
 const api = '/api/v3/drama'
@@ -178,28 +180,6 @@ router.get(`${api}/info/:id`, (req, res) => {
     })
 })
 
-const getEpisodeUrl = (url, res, title, lastEp, ep, mainId) => {
-    let results = []
-    // console.log(url)
-    rs(url, (err,resp,html) => {
-        if(err) return res.status(404).json({ success: false, error: err })
-        try {
-            const $ = cheerio.load(html)
-            $("a").each(function(index, e) {
-                if(e.attribs.download === "") {
-                    results.push({
-                        link: e.attribs.href,
-                        name: $(this).text().replace('Download\n', "").trim()
-                    })
-                }
-            }) 
-            res.json({ success: true, results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })
-        } catch (e) {
-            res.status(404).json({ success: false, error: "Something went wrong", get: "getUrl" })
-        }
-    })
-}   
-
 const newUrl = ( res, id, episode, title, lastEp, ep, mainId ) => {
     console.log(id)
     let results = []
@@ -222,17 +202,65 @@ const newUrl = ( res, id, episode, title, lastEp, ep, mainId ) => {
     })
 }
 
+async const getEpisodeUrl = (url, res, title, lastEp, ep, mainId) => {
+    let results = []
+    // console.log(url)
+    const browser = await puppeteer.launch({ 
+        args: [...chromium.args, 
+            "--hide-scrollbars", 
+            "--disable-web-security",
+            "--no-sandbox",
+            "--disable-setui-sandbox"
+        ],
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath,
+        headless: false,
+        ignoreHTTPSErrors: true,
+        // headless: false,
+        // executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome'
+     })
+    const page = await browser.newPage();
+    await page.goto("https://asianload.cc/download?id=MjY5OTg0&typesub=dramacool-SUB&title=Kingdom%3A+Ashin+of+the+North+%282021%29+Episode+1", { waitUntil: 'networkidle2'})
+    
+    let hd = await page.$$eval('a', el => el.map( x => {
+        if( x.getAttribute("href").includes("storage.googleapis.com") ) {
+            return x.getAttribute("href")
+        }
+    } ))
+    res.json({ success: hd[1], results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })
+    await page.close()
+    await browser.close()
+    // rs(url, (err,resp,html) => {
+    //     if(err) return res.status(404).json({ success: false, error: err })
+    //     try {
+    //         const $ = cheerio.load(html)
+    //         $(".download").children('a').each(function(index, e) {
+    //             // if(e.attribs.download === "") {
+    //                 results.push({
+    //                     link: e.attribs.href,
+    //                     // name: $(this).text().replace('Download\n', "").trim()
+    //                 })
+    //             // }
+    //         }) 
+    //         res.json({ success: html, results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })
+    //     } catch (e) {
+    //         res.status(404).json({ success: false, error: "Something went wrong", get: "getUrl" })
+    //     }
+    // })
+}   
+
 // watching/:id/:episode/:number
-router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
+router.get(`${api}/watching/:id/episode/:number`, (req, res) => {
     let results = []
     url = `${base}/${req.params.id}-episode-${req.params.number}.html`
-    await rs(url, (err,resp,html) => {
+    rs(url, (err,resp,html) => {
         if(err) return res.status(404).json({ success: false, error: err })
         try {
             const $ = cheerio.load(html)
             let title = $(".block, .watch-drama").children("h1").text()
             let src = $("iframe").attr("src")
-            let streamUrl = src.replace("streaming.php", "download")
+            // let streamUrl = src.replace("streaming.php", "download")
+            let streamUrl = $('.download').children("a").attr("href")
             let mainTitle = $(".category").children("a").text()
             let mainId = $(".category").children("a").attr("href").replace("/drama-detail/","")
             let lastEp = $(".list-episode-item-2, .all-episode")
@@ -252,11 +280,11 @@ router.get(`${api}/watching/:id/episode/:number`, async (req, res) => {
                 ep[index] = { id, episode, sub, epName }
             })
             
-            // getEpisodeUrl(`https:${streamUrl}`, res, title, lastEp, ep, mainId)
-            let id = req.params.id.replace(/-20\d\d/gm,"")
-            let episode = req.params.number
+            getEpisodeUrl(streamUrl, res, title, lastEp, ep, mainId)
+            // let id = req.params.id.replace(/-20\d\d/gm,"")
+            // let episode = req.params.number
             
-            newUrl( res, id, episode, title, lastEp, ep, mainId )
+            // newUrl( res, id, episode, title, lastEp, ep, mainId )
           
         } catch (e) {
             res.status(404).json({ success: false, error: "Something went wrong" })
