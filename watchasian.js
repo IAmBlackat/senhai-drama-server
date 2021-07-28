@@ -227,7 +227,7 @@ const getEpisodeUrl = async (url, res, title, lastEp, ep, mainId) => {
             return x.getAttribute("href")
         }
     } ))
-    res.json({ success: hd[1], results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })
+    res.json({ success: hd, results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })
     await page.close()
     await browser.close()
     // rs(url, (err,resp,html) => {
