@@ -202,7 +202,7 @@ const newUrl = ( res, id, episode, title, lastEp, ep, mainId ) => {
     })
 }
 
-async const getEpisodeUrl = (url, res, title, lastEp, ep, mainId) => {
+const getEpisodeUrl = async (url, res, title, lastEp, ep, mainId) => {
     let results = []
     // console.log(url)
     const browser = await puppeteer.launch({ 
@@ -220,7 +220,7 @@ async const getEpisodeUrl = (url, res, title, lastEp, ep, mainId) => {
         // executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome'
      })
     const page = await browser.newPage();
-    await page.goto("https://asianload.cc/download?id=MjY5OTg0&typesub=dramacool-SUB&title=Kingdom%3A+Ashin+of+the+North+%282021%29+Episode+1", { waitUntil: 'networkidle2'})
+    await page.goto(url, { waitUntil: 'networkidle2'})
     
     let hd = await page.$$eval('a', el => el.map( x => {
         if( x.getAttribute("href").includes("storage.googleapis.com") ) {
