@@ -214,7 +214,7 @@ const getEpisodeUrl = async (url, res, title, lastEp, ep, mainId) => {
         ],
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath,
-        headless: false,
+        headless: true,
         ignoreHTTPSErrors: true,
         // headless: false,
         // executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome'
