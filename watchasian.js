@@ -220,8 +220,8 @@ const getEpisodeUrl = async (url, res, title, lastEp, ep, mainId) => {
         // executablePath: 'C:/Program Files (x86)/Google/Chrome/Application/chrome'
      })
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle2'})
-    
+    await page.goto(url, { waitUntil: 'networkidle0' })
+    await page.waitForNavigation({ waitUntil: 'load' })
     let hd = await page.$$eval('a', el => el.map( x => {
         // if( x.getAttribute("href").includes("storage.googleapis.com") ) {
             return x.getAttribute("href")
