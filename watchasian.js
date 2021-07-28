@@ -223,11 +223,11 @@ const getEpisodeUrl = async (url, res, title, lastEp, ep, mainId) => {
     await page.goto(url, { waitUntil: 'networkidle2'})
     
     let hd = await page.$$eval('a', el => el.map( x => {
-        if( x.getAttribute("href").includes("storage.googleapis.com") ) {
+        // if( x.getAttribute("href").includes("storage.googleapis.com") ) {
             return x.getAttribute("href")
-        }
+        // }
     } ))
-    res.json({ success: hd, results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })
+    await res.json({ success: hd, results: results, title: title, lastEp: Number(lastEp), ep, mainId: mainId })
     await page.close()
     await browser.close()
     // rs(url, (err,resp,html) => {
