@@ -320,7 +320,8 @@ router.post('/download', (req,res) => {
     // res.send({ s: stream })
     fs.readFile(__dirname + "/tmp/" + ep , (err, data) => {
         if(err) res.json({ e: "error reading file" })
-        res.send(data)
+        res.contentType('text/srt')
+           .send(`data:text/srt;base64,${new Buffer.from(data).toString('base64')}`);
     })
     // const stream = __dirname + "/tmp/subs.srt"
     // res.download(stream)
