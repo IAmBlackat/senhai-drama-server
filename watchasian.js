@@ -246,6 +246,7 @@ const newUrl = ( res, id, episode, title, lastEp, ep, mainId ) => {
                     subtitle = el.attribs.href
                 }   
             })
+
             res.json({ success: true, results: results, subtitle: subtitle, title: title, lastEp: Number(lastEp), ep, mainId: mainId })            
         } catch (e) {
             res.status(404).json({ success: false, error: "Something went wrong", get: "getUrl" })
@@ -296,5 +297,34 @@ router.get(`${api}/watching/:id/episode/:number`, (req, res) => {
         }
     })
 })
+
+const https = require("https")
+const fs = require("fs");
+
+router.post('/download', (req,res) => {
+    const { subtitle } = req.body
+    // const file = https.get("https:\kdramahood.com\Subtitle\the-devil-judge\the-devil-judge-ep-2.srt")
+    // let name = subtitle.split('/')[3]
+    let ep = subtitle.split('/')[4]
+    const file = fs.createWriteStream(__dirname + "/tmp/" + ep )
+    // url = `https:/kdramahood.com/Subtitle/the-devil-judge/the-devil-judge-ep-2.srt`
+
+    https.get(subtitle, (response) => {
+        response.pipe(file)
+        // console.log(response.pipe(file))
+        file.on('finish', () => {
+            file.close()
+        })
+    } )
+    // const stream = fs.createReadStream(__dirname + "/tmp/" + "subs.srt")
+    // stream.pipe(res)
+    // res.send({ s: stream })
+    fs.readFile(__dirname + "/tmp/" + ep , (err, data) => {
+        if(err) res.json({ e: "error reading file" })
+        res.send(data)
+    })
+    // const stream = __dirname + "/tmp/subs.srt"
+    // res.download(stream)
+} )
 
 module.exports = router
