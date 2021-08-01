@@ -300,21 +300,23 @@ router.get(`${api}/watching/:id/episode/:number`, (req, res) => {
     })
 })
 
-router.post('/download', (req,res) => {
-    const { subtitle } = req.body
-    // const file = https.get("https:\kdramahood.com\Subtitle\the-devil-judge\the-devil-judge-ep-2.srt")
+router.get('/download/:title/:ep', (req,res) => {
+    // const { subtitle } = req.body
+    let title = req.params.title
+    let ep = req.params.ep
+    let file = `https:/kdramahood.com/Subtitle/${title}/${title}-ep-${ep}.srt`
     // let name = subtitle.split('/')[3]
     let ep = subtitle.split('/')[4]
     fs.createWriteStream(__dirname + "/tmp/" + ep )
     // url = `https:/kdramahood.com/Subtitle/the-devil-judge/the-devil-judge-ep-2.srt`
 
-    // https.get(subtitle, (response) => {
-    //     response.pipe(file)
-    //     // console.log(response.pipe(file))
-    //     file.on('finish', () => {
-    //         file.close()
-    //     })
-    // } )
+    https.get(file, (response) => {
+        response.pipe(file)
+        // console.log(response.pipe(file))
+        file.on('finish', () => {
+            file.close()
+        })
+    } )
     // const stream = fs.createReadStream(__dirname + "/tmp/" + "subs.srt")
     // stream.pipe(res)
     // res.send({ s: stream })
