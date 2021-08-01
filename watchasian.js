@@ -306,7 +306,7 @@ router.get('/download/:title/:ep', (req,res) => {
     let ep = req.params.ep
     let file = `https:/kdramahood.com/Subtitle/${title}/${title}-ep-${ep}.srt`
     // let name = subtitle.split('/')[3]
-    let ep = subtitle.split('/')[4]
+    // let ep = subtitle.split('/')[4]
     fs.createWriteStream(__dirname + "/tmp/" + ep )
     // url = `https:/kdramahood.com/Subtitle/the-devil-judge/the-devil-judge-ep-2.srt`
     // https.get(file, (response) => {
