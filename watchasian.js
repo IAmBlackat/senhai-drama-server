@@ -5,7 +5,7 @@ const rs = require("request");
 const chromium = require('chrome-aws-lambda');
 const puppeteer = require("puppeteer")
 // const https = require("https")
-const fs = require("fs");
+// const fs = require("fs");
 
 const base = 'https://watchasian.cc'
 const api = '/api/v3/drama'
@@ -300,32 +300,33 @@ router.get(`${api}/watching/:id/episode/:number`, (req, res) => {
     })
 })
 
-router.get('/download/:title/:ep', (req,res) => {
-    // const { subtitle } = req.body
-    let title = req.params.title
-    let ep = req.params.ep
-    let file = `https:/kdramahood.com/Subtitle/${title}/${title}-ep-${ep}.srt`
-    // let name = subtitle.split('/')[3]
-    // let ep = subtitle.split('/')[4]
-    fs.createWriteStream(__dirname + "/tmp/" + ep )
-    // url = `https:/kdramahood.com/Subtitle/the-devil-judge/the-devil-judge-ep-2.srt`
-    // https.get(file, (response) => {
-    //     response.pipe(file)
-    //     // console.log(response.pipe(file))
-    //     file.on('finish', () => {
-    //         file.close()
-    //     })
-    // } )
-    // const stream = fs.createReadStream(__dirname + "/tmp/" + "subs.srt")
-    // stream.pipe(res)
-    // res.send({ s: stream })
-    fs.readFile(__dirname + "/tmp/" + ep , (err, data) => {
-        if(err) res.json({ e: "error reading file" })
-        res.contentType('text/srt')
-           .send(`data:text/srt;base64,${new Buffer.from(data).toString('base64')}`);
-    })
-    // const stream = __dirname + "/tmp/subs.srt"
-    // res.download(stream)
-} )
+// router.get('/download/:title/:ep', (req,res) => {
+//     // const { subtitle } = req.body
+//     let title = req.params.title
+//     let ep = req.params.ep
+//     let file = `https:/kdramahood.com/Subtitle/${title}/${title}-ep-${ep}.srt`
+//     // let name = subtitle.split('/')[3]
+//     // let ep = subtitle.split('/')[4]
+//     fs.createWriteStream(__dirname + "/tmp/" + ep )
+//     // url = `https:/kdramahood.com/Subtitle/the-devil-judge/the-devil-judge-ep-2.srt`
+//     // https.get(file, (response) => {
+//     //     response.pipe(file)
+//     //     // console.log(response.pipe(file))
+//     //     file.on('finish', () => {
+//     //         file.close()
+//     //     })
+//     // } )
+//     // const stream = fs.createReadStream(__dirname + "/tmp/" + "subs.srt")
+//     // stream.pipe(res)
+//     // res.send({ s: stream })
+//     fs.readFile(__dirname + "/tmp/" + ep , (err, data) => {
+//         if(err) res.json({ e: "error reading file" })
+//         res.contentType('text/srt')
+//         //    .send(`data:text/srt;base64,${new Buffer.from(data).toString('base64')}`);
+//         .send(data)
+//     })
+//     // const stream = __dirname + "/tmp/subs.srt"
+//     // res.download(stream)
+// } )
 
 module.exports = router
