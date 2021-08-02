@@ -3,7 +3,7 @@ const ai = express.Router()
 const cheerio = require("cheerio");
 const rs = require("request");
 
-const base = 'https://ww3.kissasian.ai/'
+const base = 'https://kissasian.ws/'
 const api = '/api/v1/drama'
 
 ai.get(`${api}`, (req, res) => res.send(" This is the index api from v1"))
@@ -86,39 +86,59 @@ ai.post('/kdramaInfo', (req,res) => {
     })
 })
 
-ai.post("/kdramaWatch", (req, res) => {
+ai.post(`${api}/kdramawatch`, (req, res) => {
     const { epID } = req.body
-    let watch = [];
-    let url = `${base}${epID}`
+    // let watch = [];
+    let url = `${base}drama/${epID}`
     rs(url, (err, resp, html) => {
         if(!err) {
             try {
                 const $ = cheerio.load(html)
-                let videoUrl = $(".play-video").children("iframe").attr().src
-                let dlPage = "https:"+videoUrl.replace("streaming.php","download")
-                console.log(dlPage)
-                // go to dl page
-                rs(dlPage, (err, resp, html) => {
-                    if(!err) {  
-                        try {
-                            const $ = cheerio.load(html)
-                            $("a").each(function(index, element) {
-                                if(element.attribs.download === "") {
-                                    watch.push({
-                                        link: element.attribs.href,
-                                        name: $(this).text().replace("Download\n","").trim()
-                                    })
-                                }
-                            })
-                            res.json({ watch: watch })
-
-                        } catch(e) {
-                            res.status(404).json({ error: err })
-                        }
-                    } else {
-                        res.json({ error: "can't load dlPage" })
+                let asianload = ""
+                $("#selectServer").children("option").each( (i,e) => {
+                    if( e.attribs.value.includes("asianload.cc/embedplus") ) {
+                        asianload = e.attribs.value
                     }
                 })
+                // let a = $(".left").text()
+                // let videoUrl = $(".play-video").children("iframe").attr().src
+                // let dlPage = "https:"+videoUrl.replace("streaming.php","download")
+                // console.log(asianload)
+                rs(asianload, (err, resp, html) => {
+                    if(!err) {
+                        try {
+                            const $ = cheerio.load(html)
+                            let script = $(".wrapper").children(".videocontent").children("script").html().match(/\[(.*?)\]/gm)
+                            // let a = JSON.stringify(script)
+                            // let b = JSON.parse(a)
+                            res.json({ results: script })
+                        } catch (e) {
+                            res.json({ e: e })
+                        }
+                    }
+                })
+                // go to dl page
+                // rs(dlPage, (err, resp, html) => {
+                //     if(!err) {  
+                //         try {
+                //             const $ = cheerio.load(html)
+                //             $("a").each(function(index, element) {
+                //                 if(element.attribs.download === "") {
+                //                     watch.push({
+                //                         link: element.attribs.href,
+                //                         name: $(this).text().replace("Download\n","").trim()
+                //                     })
+                //                 }
+                //             })
+                //             res.json({ watch: watch })
+
+                //         } catch(e) {
+                //             res.status(404).json({ error: err })
+                //         }
+                //     } else {
+                //         res.json({ error: "can't load dlPage" })
+                //     }
+                // })
 
             } catch(e) {
                 res.status(404).json({ error: "something went wrong" })
