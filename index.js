@@ -9,7 +9,7 @@ const cdn = require('./xtream')
 
 const port = process.env.PORT || 5000;
 
-// var whitelist = ['http://localhost:3000', 'https://sh-drama.vercel.app', 'https://sh-drama.netlify.app']
+// var whitelist = ['http://localhost:3000', 'https://dheaven.herokuapp.com/', '143.198.128.112']
 // var corsOptionsDelegate = function (req, callback) {
 //   var corsOptions;
 //   if (whitelist.indexOf(req.header('Origin')) !== -1) {
